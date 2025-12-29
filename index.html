@@ -107,8 +107,11 @@
   </div>
 
   <script>
-    const ART_ID = 1363;
+   // 1. Obtenemos los parámetros de la URL (lo que va después del ?)
+const urlParams = new URLSearchParams(window.location.search);
 
+// 2. Buscamos el parámetro 'id'. Si no existe, usamos uno por defecto (opcional)
+const ART_ID = urlParams.get('id');
     fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID, {
       headers: {
         "ngrok-skip-browser-warning": "true"
