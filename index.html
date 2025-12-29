@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Artículo</title>
+</head>
+<body>
+  <h1 id="nombre">Cargando...</h1>
+  <p><b>Precio:</b> $<span id="precio">-</span></p>
+  <p><b>Existencia:</b> <span id="existencia">-</span></p>
+
+  <script>
+    const ART_ID = 1363;
+
+    fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Error HTTP " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById("nombre").innerText = data.descripcion;
+        document.getElementById("precio").innerText = data.precio1;
+        document.getElementById("existencia").innerText = data.existencia;
+      })
+      .catch(error => {
+        console.error(error);
+        document.body.innerHTML = "<h2>Error cargando artículo</h2>";
+      });
+  </script>
+</body>
+</html>
