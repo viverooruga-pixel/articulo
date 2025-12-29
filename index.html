@@ -3,102 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>Artículo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f4f6f5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .card {
-      background: #ffffff;
-      width: 90%;
-      max-width: 420px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      padding: 24px;
-      text-align: center;
-    }
-
-    .nombre {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #2f3e34;
-    }
-
-    .precio {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #1b8f5a;
-      margin: 16px 0;
-    }
-
-    .existencia {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 24px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      background: #eaf7f1;
-      color: #1b8f5a;
-      font-weight: 600;
-    }
-
-    .footer {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 16px;
-    }
-  </style>
 </head>
-
 <body>
+  <h1 id="nombre">Cargando...</h1>
+  <p><b>Precio:</b> $<span id="precio">-</span></p>
+  <p><b>Existencia:</b> <span id="existencia">-</span></p>
 
-  <div class="card">
-    <div class="nombre" id="nombre">Cargando…</div>
+<script>
+  const ART_ID = 1363;
 
-    <div class="precio">
-      $<span id="precio">--</span>
-    </div>
-
-    <div class="existencia">
-      Existencia: <span id="existencia">--</span>
-    </div>
-
-    <div class="badge">Información del vivero</div>
-
-    <div class="footer">
-      Vivero Oruga 🌱
-    </div>
-  </div>
-
-  <script>
-    const ART_ID = 1363;
-
-    fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("nombre").innerText = data.descripcion;
-        document.getElementById("precio").innerText = data.precio1;
-        document.getElementById("existencia").innerText = data.existencia;
-      })
-      .catch(() => {
-        document.querySelector(".card").innerHTML =
-          "<h2>Error cargando artículo</h2>";
-      });
-  </script>
-
+  fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID, {
+    headers: {
+      "ngrok-skip-browser-warning": "true"
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Error HTTP " + response.status);
+    }
+    return response.json();
+  })
+  .then(data => {
+    document.getElementById("nombre").innerText = data.descripcion;
+    document.getElementById("precio").innerText = data.precio1;
+    document.getElementById("existencia").innerText = data.existencia;
+  })
+  .catch(error => {
+    console.error(error);
+    document.body.innerHTML = "<h2>Error cargando artículo</h2>";
+  });
+</script>
 </body>
 </html>
