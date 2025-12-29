@@ -2,36 +2,134 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Artículo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Producto</title>
+  
+  <style>
+    /* Estilos Visuales */
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #95a5a6;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #2c3e50;
+      margin: 10px 0;
+    }
+
+    .price-tag {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #27ae60; /* Verde para el precio */
+      margin: 20px 0;
+    }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 50px;
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Estado de carga */
+    .loading {
+      color: #7f8c8d;
+      font-style: italic;
+    }
+
+    /* Botonera opcional */
+    .btn {
+      margin-top: 25px;
+      display: block;
+      padding: 12px;
+      background-color: #3498db;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="nombre">Cargando...</h1>
-  <p><b>Precio:</b> $<span id="precio">-</span></p>
-  <p><b>Existencia:</b> <span id="existencia">-</span></p>
 
-<script>
-  const ART_ID = 1363;
+  <div class="container">
+    <div class="card" id="product-card">
+      <span class="brand">Información de Producto</span>
+      
+      <h1 id="nombre" class="loading">Cargando...</h1>
+      
+      <div class="price-tag">
+        $<span id="precio">-</span>
+      </div>
+      
+      <div class="stock-badge">
+        Stock disponible: <span id="existencia">-</span>
+      </div>
 
-  fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID, {
-    headers: {
-      "ngrok-skip-browser-warning": "true"
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Error HTTP " + response.status);
-    }
-    return response.json();
-  })
-  .then(data => {
-    document.getElementById("nombre").innerText = data.descripcion;
-    document.getElementById("precio").innerText = data.precio1;
-    document.getElementById("existencia").innerText = data.existencia;
-  })
-  .catch(error => {
-    console.error(error);
-    document.body.innerHTML = "<h2>Error cargando artículo</h2>";
-  });
-</script>
+      <a href="#" onclick="window.location.reload()" class="btn">Actualizar</a>
+    </div>
+  </div>
+
+  <script>
+    const ART_ID = 1363;
+
+    fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/" + ART_ID, {
+      headers: {
+        "ngrok-skip-browser-warning": "true"
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Error HTTP " + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Quitamos la clase de carga y ponemos los datos
+      const nombreEl = document.getElementById("nombre");
+      nombreEl.innerText = data.descripcion;
+      nombreEl.classList.remove("loading");
+      
+      document.getElementById("precio").innerText = parseFloat(data.precio1).toLocaleString('es-MX', {minimumFractionDigits: 2});
+      document.getElementById("existencia").innerText = data.existencia;
+    })
+    .catch(error => {
+      console.error(error);
+      document.getElementById("product-card").innerHTML = 
+        `<h2 style="color: #e74c3c;">Error</h2><p>No se pudo conectar con el servidor.</p>`;
+    });
+  </script>
 </body>
 </html>
