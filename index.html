@@ -6,7 +6,6 @@
   <title>Consulta de Producto</title>
   
   <style>
-    /* Estilos Visuales */
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background-color: #f0f2f5;
@@ -31,6 +30,13 @@
       text-align: center;
     }
 
+    /* ESTILO PARA TU LOGO */
+    .logo-empresa {
+      max-width: 150px; /* Ajusta el ancho según tu logo */
+      height: auto;
+      margin-bottom: 20px;
+    }
+
     .brand {
       font-size: 0.7rem;
       text-transform: uppercase;
@@ -49,7 +55,7 @@
     .price-tag {
       font-size: 2.5rem;
       font-weight: bold;
-      color: #27ae60; /* Verde para el precio */
+      color: #27ae60;
       margin: 20px 0;
     }
 
@@ -63,13 +69,8 @@
       font-size: 0.9rem;
     }
 
-    /* Estado de carga */
-    .loading {
-      color: #7f8c8d;
-      font-style: italic;
-    }
+    .loading { color: #7f8c8d; font-style: italic; }
 
-    /* Botonera opcional */
     .btn {
       margin-top: 25px;
       display: block;
@@ -86,7 +87,10 @@
 
   <div class="container">
     <div class="card" id="product-card">
-      <span class="brand">Información de Producto</span>
+      
+      <img src="URL_DE_TU_IMAGEN_AQUI.png" alt="Logo Empresa" class="logo-empresa">
+      
+      <span class="brand">Consulta de Inventario</span>
       
       <h1 id="nombre" class="loading">Cargando...</h1>
       
@@ -98,7 +102,7 @@
         Stock disponible: <span id="existencia">-</span>
       </div>
 
-      <a href="#" onclick="window.location.reload()" class="btn">Actualizar</a>
+      <a href="#" onclick="window.location.reload()" class="btn">Escanear otro</a>
     </div>
   </div>
 
@@ -111,24 +115,25 @@
       }
     })
     .then(response => {
-      if (!response.ok) {
-        throw new Error("Error HTTP " + response.status);
-      }
+      if (!response.ok) throw new Error("Error HTTP " + response.status);
       return response.json();
     })
     .then(data => {
-      // Quitamos la clase de carga y ponemos los datos
       const nombreEl = document.getElementById("nombre");
       nombreEl.innerText = data.descripcion;
       nombreEl.classList.remove("loading");
       
-      document.getElementById("precio").innerText = parseFloat(data.precio1).toLocaleString('es-MX', {minimumFractionDigits: 2});
+      // Formato de moneda mexicana o local
+      document.getElementById("precio").innerText = parseFloat(data.precio1).toLocaleString('es-MX', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
       document.getElementById("existencia").innerText = data.existencia;
     })
     .catch(error => {
       console.error(error);
       document.getElementById("product-card").innerHTML = 
-        `<h2 style="color: #e74c3c;">Error</h2><p>No se pudo conectar con el servidor.</p>`;
+        `<h2 style="color: #e74c3c;">Error</h2><p>No se pudo obtener la información.</p>`;
     });
   </script>
 </body>
