@@ -135,7 +135,11 @@
 
       estado.innerHTML = '<div class="loader">Buscando…</div>';
 
-      fetch(`${API_BASE}/articulos/buscar?nombre=${encodeURIComponent(texto)}`)
+      fetch(`${API_BASE}/articulos/buscar?nombre=${encodeURIComponent(texto)}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true"
+      }
+    })
         .then(r => {
           if (!r.ok) throw new Error("Error HTTP " + r.status);
           return r.json();
@@ -171,3 +175,4 @@
 
 </body>
 </html>
+
