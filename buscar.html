@@ -2,79 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buscar artículo</title>
-
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      padding: 16px;
-      background: #f5f5f5;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-
-    .item {
-      background: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .item strong {
-      display: block;
-      font-size: 18px;
-    }
-
-    .item small {
-      color: #555;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-  <input type="text" id="busqueda" placeholder="Buscar planta por nombre…">
+  <h2>🔍 Buscar artículo</h2>
 
-  <div id="resultados"></div>
+  <form id="form-buscar">
+    <input 
+      type="text" 
+      id="nombre" 
+      placeholder="Ej. zapote"
+      required
+    >
+    <button type="submit">Buscar</button>
+  </form>
+
+  <hr>
+
+  <div id="resultado"></div>
 
   <script>
-    const input = document.getElementById("busqueda");
-    const contenedor = document.getElementById("resultados");
+    const form = document.getElementById("form-buscar");
 
-    input.addEventListener("input", () => {
-      const texto = input.value.trim();
+    form.addEventListener("submit", function (e) {
+      e.preventDefault(); // 🔥 ESTO ES LA CLAVE
 
-      if (texto.length < 2) {
-        contenedor.innerHTML = "";
-        return;
-      }
+      const nombre = document.getElementById("nombre").value.trim();
+      if (!nombre) return;
 
-      fetch("https://onie-undeprived-semaj.ngrok-free.dev/articulos/buscar?nombre=" + encodeURIComponent(texto))
-        .then(res => res.json())
+      fetch(`https://onie-undeprived-semaj.ngrok-free.dev/articulos/buscar?nombre=${encodeURIComponent(nombre)}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Error HTTP " + res.status);
+          return res.json();
+        })
         .then(data => {
-          contenedor.innerHTML = "";
-
-          if (data.length === 0) {
-            contenedor.innerHTML = "<p>No se encontraron resultados</p>";
-            return;
-          }
-
-          data.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "item";
-            div.innerHTML = `
-              <strong>${item.descripcion}</strong>
-              <small>Precio: $${item.precio1} | Existencia: ${item.existencia}</small><br>
-              <a href="articulo.html?id=${item.art_id}">Ver ficha</a>
+          let html = "<ul>";
+          data.forEach(a => {
+            html += `
+              <li>
+                <b>${a.descripcion}</b><br>
+                Precio: $${a.precio1}<br>
+                Existencia: ${a.existencia}<br>
+                <a href="./?id=${a.art_id}">Ver detalle</a>
+                <hr>
+              </li>
             `;
-            contenedor.appendChild(div);
           });
+          html += "</ul>";
+          document.getElementById("resultado").innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById("resultado").innerHTML =
+            "<p>Error buscando artículos</p>";
+          console.error(err);
         });
     });
   </script>
