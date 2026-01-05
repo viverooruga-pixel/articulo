@@ -32,7 +32,11 @@
       const nombre = document.getElementById("nombre").value.trim();
       if (!nombre) return;
 
-      fetch(`https://onie-undeprived-semaj.ngrok-free.dev/articulos/buscar?nombre=${encodeURIComponent(nombre)}`)
+      fetch(`https://onie-undeprived-semaj.ngrok-free.dev/articulos/buscar?nombre=${encodeURIComponent(nombre)}`,  {
+        headers: {
+        "ngrok-skip-browser-warning": "true"
+        }
+      })
         .then(res => {
           if (!res.ok) throw new Error("Error HTTP " + res.status);
           return res.json();
@@ -63,3 +67,4 @@
 
 </body>
 </html>
+
