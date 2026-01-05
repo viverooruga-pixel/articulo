@@ -4,67 +4,170 @@
   <meta charset="UTF-8">
   <title>Buscar artículo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:active {
+      background: #005fd1;
+    }
+
+    .loader {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .error {
+      color: #c0392b;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .results {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .card h3 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+
+    .price {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .id {
+      font-size: 13px;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>🔍 Buscar artículo</h2>
+  <div class="container">
+    <h1>🔍 Buscar artículo</h1>
 
-  <form id="form-buscar">
-    <input 
-      type="text" 
-      id="nombre" 
-      placeholder="Ej. zapote"
-      required
-    >
-    <button type="submit">Buscar</button>
-  </form>
+    <div class="search-box">
+      <input
+        type="text"
+        id="busqueda"
+        placeholder="Ej. zapote"
+        onkeypress="if(event.key==='Enter') buscar()"
+      >
+      <button onclick="buscar()">Buscar</button>
+    </div>
 
-  <hr>
-
-  <div id="resultado"></div>
+    <div id="estado"></div>
+    <div class="results" id="resultados"></div>
+  </div>
 
   <script>
-    const form = document.getElementById("form-buscar");
+    const API_BASE = "https://onie-undeprived-semaj.ngrok-free.dev";
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault(); // 🔥 ESTO ES LA CLAVE
+    function buscar() {
+      const texto = document.getElementById("busqueda").value.trim();
+      const estado = document.getElementById("estado");
+      const resultados = document.getElementById("resultados");
 
-      const nombre = document.getElementById("nombre").value.trim();
-      if (!nombre) return;
+      estado.innerHTML = "";
+      resultados.innerHTML = "";
 
-      fetch(`https://onie-undeprived-semaj.ngrok-free.dev/articulos/buscar?nombre=${encodeURIComponent(nombre)}`,  {
-        headers: {
-        "ngrok-skip-browser-warning": "true"
-        }
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Error HTTP " + res.status);
-          return res.json();
+      if (!texto) {
+        estado.innerHTML = '<div class="error">Escribe un nombre</div>';
+        return;
+      }
+
+      estado.innerHTML = '<div class="loader">Buscando…</div>';
+
+      fetch(`${API_BASE}/articulos/buscar?nombre=${encodeURIComponent(texto)}`)
+        .then(r => {
+          if (!r.ok) throw new Error("Error HTTP " + r.status);
+          return r.json();
         })
         .then(data => {
-          let html = "<ul>";
+          estado.innerHTML = "";
+
+          if (data.length === 0) {
+            estado.innerHTML = '<div class="error">No se encontraron artículos</div>';
+            return;
+          }
+
           data.forEach(a => {
-            html += `
-              <li>
-                <b>${a.descripcion}</b><br>
-                Precio: $${a.precio1}<br>
-                Existencia: ${a.existencia}<br>
-                <a href="./?id=${a.art_id}">Ver detalle</a>
-                <hr>
-              </li>
+            const card = document.createElement("div");
+            card.className = "card";
+
+            card.innerHTML = `
+              <h3>${a.descripcion}</h3>
+              <p class="price">$${a.precio1}</p>
+              <p>Existencia: ${a.existencia}</p>
+              <p class="id">ID: ${a.art_id}</p>
             `;
+
+            resultados.appendChild(card);
           });
-          html += "</ul>";
-          document.getElementById("resultado").innerHTML = html;
         })
         .catch(err => {
-          document.getElementById("resultado").innerHTML =
-            "<p>Error buscando artículos</p>";
           console.error(err);
+          estado.innerHTML = '<div class="error">Error buscando artículos</div>';
         });
-    });
+    }
   </script>
 
 </body>
 </html>
-
